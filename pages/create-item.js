@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ethers } from "ethers";
-import { create } from "ipfs-http-client";
+import { create as ipfsHttpClient } from "ipfs-http-client";
 import { useRouter } from "next/router";
 import Web3Modal from "web3modal";
 
@@ -16,6 +16,8 @@ export default function CreateItem() {
     name: "",
     description: "",
   });
+  const web3modalRef = useRef();
+
   const router = useRouter();
 
   useEffect(() => {
@@ -24,7 +26,6 @@ export default function CreateItem() {
       providerOptions: {},
       disableInjectedProvider: false,
     });
-    loadNfts();
   }, []);
   const getProviderOrSigner = async (needSigner = false) => {
     const provider = await web3modalRef.current.connect();
@@ -76,14 +77,14 @@ export default function CreateItem() {
   async function createSale(url) {
     const signer = await getProviderOrSigner(true);
     let contract = new ethers.Contract(address, abi, signer);
-    let transaction = await contract.createToken(url);
+    const price = ethers.utils.parseUnits(formInput.price, "ether");
+    let transaction = await contract.createToken(url, price);
     let tx = await transaction.wait();
 
     let event = tx.events[0];
     let value = event.args[2];
     let tokenId = value.toNumber();
 
-    const price = ethers.utils.parseUnits(formInput.price, "ether");
     let listingPrice = await contract.getListingPrice();
     listingPrice = listingPrice.toString();
 
@@ -96,7 +97,7 @@ export default function CreateItem() {
 
   return (
     <div className="flex justify-center">
-      <div className="w-1/12 flex flex-col pb-12">
+      <div className="w-1/2 flex flex-col pb-12">
         <input
           placeholder="Asset Name"
           className="mt-8 border rounded p-4"
@@ -121,7 +122,7 @@ export default function CreateItem() {
         <input type="file" name="Asset" className="my-4" onChange={onChange} />
         {fileUrl && <img className="rounded mt-4" width="350" src={fileUrl} />}
         <button
-          onClick={createMarket}
+          onClick={createSale}
           className="font-bold mt-4 bg-pink-500 text-white rounded p-4 shadow-lg"
         >
           Create Digital Asset
