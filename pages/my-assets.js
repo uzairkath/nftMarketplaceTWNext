@@ -4,7 +4,7 @@ import axios from "axios";
 import Web3Modal from "web3modal";
 import { address, abi } from "../config";
 
-export default function myAssets() {
+export default function MyAssets() {
   const [nfts, setNfts] = useState([]);
   const [loadingState, setLoadingState] = useState("not-loaded");
   const web3modalRef = useRef();
