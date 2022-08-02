@@ -8,6 +8,7 @@ export default function Home() {
   const [nfts, setNfts] = useState([]);
   const [loadingState, setLoadingState] = useState("not-loaded");
   const web3modalRef = useRef();
+  axios.defaults.baseURL = "";
 
   useEffect(() => {
     web3modalRef.current = new Web3Modal({
