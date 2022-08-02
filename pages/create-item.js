@@ -33,8 +33,8 @@ export default function CreateItem() {
     const { chainId } = await web3Provider.getNetwork();
     console.log(chainId);
     if (chainId !== 4) {
-      alert("Connect to Mumbai Test Network");
-      throw new Error("Connect to Mumbai Test Network");
+      alert("Connect to rinkeby Test Network");
+      throw new Error("Connect to rinkeby Test Network");
     }
     if (needSigner == true) {
       const signer = web3Provider.getSigner();
