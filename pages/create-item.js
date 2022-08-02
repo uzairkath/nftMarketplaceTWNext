@@ -7,7 +7,7 @@ import Web3Modal from "web3modal";
 const client = ipfsHttpClient("https://ipfs.infura.io:5001/api/v0");
 
 import { address, abi } from "../config";
-import { formatUnits } from "ethers/lib/utils";
+import { formatUnits, parseEther } from "ethers/lib/utils";
 
 export default function CreateItem() {
   const [fileUrl, setFileUrl] = useState(null);
@@ -22,9 +22,9 @@ export default function CreateItem() {
 
   useEffect(() => {
     web3modalRef.current = new Web3Modal({
-      network: "mumbai",
+      network: "rinkeby",
       providerOptions: {},
-      disableInjectedProvider: false,
+      disableInjectionProvider: false,
     });
   }, []);
   const getProviderOrSigner = async (needSigner = false) => {
@@ -32,7 +32,7 @@ export default function CreateItem() {
     const web3Provider = new ethers.providers.Web3Provider(provider);
     const { chainId } = await web3Provider.getNetwork();
     console.log(chainId);
-    if (chainId !== 80001) {
+    if (chainId !== 4) {
       alert("Connect to Mumbai Test Network");
       throw new Error("Connect to Mumbai Test Network");
     }
@@ -76,22 +76,27 @@ export default function CreateItem() {
 
   async function createSale(url) {
     const signer = await getProviderOrSigner(true);
+    console.log(await signer.getAddress());
     let contract = new ethers.Contract(address, abi, signer);
+    console.log(contract);
     const price = ethers.utils.parseUnits(formInput.price, "ether");
-    let transaction = await contract.createToken(url, price);
+    let listingPrice = await contract.getListingPrice();
+    console.log(listingPrice.toString());
+    console.log(url);
+    console.log(price);
+    let transaction = await contract.createToken(url, price, {
+      value: listingPrice,
+    });
     let tx = await transaction.wait();
 
     let event = tx.events[0];
     let value = event.args[2];
     let tokenId = value.toNumber();
 
-    let listingPrice = await contract.getListingPrice();
-    listingPrice = listingPrice.toString();
-
-    transaction = await contract.createMarketItem(tokenId, price, {
-      value: listingPrice,
-    });
-    await transaction.wait();
+    // transaction = await contract.createMarketItem(tokenId, price, {
+    //   value: listingPrice,
+    // });
+    // await transaction.wait();
     router.push("/");
   }
 
@@ -122,8 +127,8 @@ export default function CreateItem() {
         <input type="file" name="Asset" className="my-4" onChange={onChange} />
         {fileUrl && <img className="rounded mt-4" width="350" src={fileUrl} />}
         <button
-          onClick={createSale}
-          className="font-bold mt-4 bg-pink-500 text-white rounded p-4 shadow-lg"
+          onClick={createItem}
+          className="font-bold mt-4 bg-green-500 text-white rounded p-4 shadow-lg"
         >
           Create Digital Asset
         </button>

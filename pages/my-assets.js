@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { ethers } from "ethers";
+import axios from "axios";
 import Web3Modal from "web3modal";
-
 import { address, abi } from "../config";
 
 export default function myAssets() {
@@ -11,7 +11,7 @@ export default function myAssets() {
 
   useEffect(() => {
     web3modalRef.current = new Web3Modal({
-      network: "mumbai",
+      network: "rinkeby",
       providerOptions: {},
       disableInjectedProvider: false,
     });
@@ -22,7 +22,7 @@ export default function myAssets() {
     const web3Provider = new ethers.providers.Web3Provider(provider);
     const { chainId } = await web3Provider.getNetwork();
     console.log(chainId);
-    if (chainId !== 80001) {
+    if (chainId !== 4) {
       alert("Connect to Mumbai Test Network");
       throw new Error("Connect to Mumbai Test Network");
     }
@@ -34,8 +34,7 @@ export default function myAssets() {
   };
   const loadNfts = async () => {
     const signer = await getProviderOrSigner(true);
-    console.log(signer);
-    console.log(address);
+    console.log(await signer.getAddress());
     const contract = new ethers.Contract(address, abi, signer);
     console.log(contract);
     // const data = await contract.ownerOf(1);
