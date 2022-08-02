@@ -46,7 +46,7 @@ export default function Home() {
       data.map(async i => {
         const tokenUri = await contract.tokenURI(i.tokenId);
         console.log(tokenUri);
-        let meta = await fetch(tokenUri);
+        let meta = await fetch(`${tokenUri}`);
         meta = await meta.json();
         console.log(meta);
         let price = ethers.utils.formatUnits(i.price.toString(), "ether");
