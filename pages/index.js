@@ -46,7 +46,8 @@ export default function Home() {
       data.map(async i => {
         const tokenUri = await contract.tokenURI(i.tokenId);
         console.log(tokenUri);
-        const meta = await axios.get(tokenUri);
+        let meta = await fetch(tokenUri);
+        meta = await meta.json();
         console.log(meta);
         let price = ethers.utils.formatUnits(i.price.toString(), "ether");
         let item = {
@@ -54,9 +55,9 @@ export default function Home() {
           tokenId: i.tokenId.toNumber(),
           seller: i.seller,
           owner: i.owner,
-          image: meta.data.image,
-          name: meta.data.name,
-          description: meta.data.description,
+          image: meta.image,
+          name: meta.name,
+          description: meta.description,
         };
         console.log(item);
         return item;
@@ -84,8 +85,8 @@ export default function Home() {
     return <h1 className="px-20 `py-10 text-3xl ">No items in marketplace</h1>;
   }
   return (
-    <div className="flex justify-center">
-      <div className="px-4" style={{ maxWidth: "1600px" }}>
+    <div className="flex">
+      <div className="px-2" style={{ maxWidth: "1600px" }}>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 pt-4">
           {nfts.map((nft, i) => (
             <div
